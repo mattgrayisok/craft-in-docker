@@ -1,4 +1,4 @@
-# A Basic LEMP in Docker
+# Craft in Docker
 
 `docker-compose up -d` <-- Create containers and start them
 
