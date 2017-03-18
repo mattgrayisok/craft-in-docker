@@ -1,0 +1,64 @@
+version: '2'
+services:
+    nginx:
+        build:
+            context: .
+            dockerfile: ./containers/nginx/Dockerfile
+        ports:
+            - 80:80
+        links:
+            - php
+        volumes_from:
+            - app-data
+
+    php:
+        build:
+            context: .
+            dockerfile: ./containers/php/Dockerfile
+        expose:
+            - 9000
+        links:
+            - mysql
+        volumes_from:
+            - app-data
+
+    app-data:
+        build:
+            context: .
+            dockerfile: ./containers/php/Dockerfile
+        volumes:
+            - ./src/public:/var/www/html/public
+            - ./src/templates:/var/www/html/craft/templates
+            - ./src/plugins:/var/www/html/craft/plugins
+            - ./src/config:/var/www/html/craft/config
+        command: "true"
+
+    mysql:
+        build:
+            context: .
+            dockerfile: ./containers/mysql/Dockerfile
+        volumes_from:
+            - mysql-data
+        environment:
+            MYSQL_ROOT_PASSWORD: secret
+            MYSQL_DATABASE: project
+            MYSQL_USER: project
+            MYSQL_PASSWORD: project
+
+    mysql-data:
+        build:
+            context: .
+            dockerfile: ./containers/mysql/Dockerfile
+        volumes:
+            - /var/lib/mysql
+        command: "true"
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        ports:
+            - 8085:80
+        links:
+            - mysql
+        environment:
+            PMA_HOST: mysql
+
